@@ -22,7 +22,13 @@
 
 #include <net/netfilter/ipv4/nf_defrag_ipv4.h>
 
-#if IS_ENABLED(CONFIG_IP6_NF_IPTABLES)
+/*
+ * Only include the following if ip6 tables is compiled in
+ * the kernel, or it is a module and this code is also a module.
+*/
+#if defined(CONFIG_IP6_NF_IPTABLES) || \
+	(defined(CONFIG_IP6_NF_IPTABLES_MODULE) && \
+	 defined(CONFIG_NETFILTER_XT_TARGET_TPROXY_MODULE))
 #define XT_TPROXY_HAVE_IPV6 1
 #include <net/if_inet6.h>
 #include <net/addrconf.h>
