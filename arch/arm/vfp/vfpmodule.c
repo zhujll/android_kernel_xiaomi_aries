@@ -722,6 +722,26 @@ static const struct file_operations vfp_bounce_fops = {
 	.llseek		= seq_lseek,
 	.release	= single_release,
 };
+
+static int proc_read_status(char *page, char **start, off_t off, int count,
+			    int *eof, void *data)
+{
+	char *p = page;
+	int len;
+
+	p += snprintf(p, PAGE_SIZE, "%llu\n", atomic64_read(&vfp_bounce_count));
+
+	len = (p - page) - off;
+	if (len < 0)
+		len = 0;
+
+	*eof = (len <= count) ? 1 : 0;
+	*start = page + off;
+
+	return len;
+}
+
+
 #endif
 
 /*
@@ -731,9 +751,6 @@ static int __init vfp_init(void)
 {
 	unsigned int vfpsid;
 	unsigned int cpu_arch = cpu_architecture();
-#ifdef CONFIG_PROC_FS
-	static struct proc_dir_entry *procfs_entry;
-#endif
 	if (cpu_arch >= CPU_ARCH_ARMv6)
 		on_each_cpu(vfp_enable, NULL, 1);
 
@@ -803,10 +820,18 @@ static int __init vfp_init(void)
 		}
 	}
 
+	return 0;
+}
+
+static int __init vfp_late_init(void) {
 #ifdef CONFIG_PROC_FS
-	procfs_entry = proc_create("cpu/vfp_bounce", S_IRUGO, NULL,
-			&vfp_bounce_fops);
-	if (!procfs_entry)
+	static struct proc_dir_entry *procfs_entry;
+
+	procfs_entry = create_proc_entry("cpu/vfp_bounce", S_IRUGO, NULL);
+
+	if (procfs_entry)
+		procfs_entry->read_proc = proc_read_status;
+	else
 		pr_err("Failed to create procfs node for VFP bounce reporting\n");
 #endif
 
@@ -814,3 +839,4 @@ static int __init vfp_init(void)
 }
 
 core_initcall(vfp_init);
+late_initcall(vfp_late_init);
