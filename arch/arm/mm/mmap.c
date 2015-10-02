@@ -11,6 +11,11 @@
 #include <linux/random.h>
 #include <asm/cachetype.h>
 
+int mmap_rnd_bits_min = CONFIG_ARCH_MMAP_RND_BITS_MIN;
+int mmap_rnd_bits_max = CONFIG_ARCH_MMAP_RND_BITS_MAX;
+int mmap_rnd_bits = CONFIG_ARCH_MMAP_RND_BITS;
+
+
 static inline unsigned long COLOUR_ALIGN_DOWN(unsigned long addr,
 					      unsigned long pgoff)
 {
