@@ -11,7 +11,7 @@ menu "XIAOMI Specific Patches"
 config UPDATE_LCDC_LUT
 	bool "Set initial Qualcomm LCDC lut"
 	default n
-	depends on MACH_XIAOMI
+	depends on MACH_XIAOMI  && FB_MSM_MDP_HW
 	help
 	  Set initial Qualcomm LCDC Look Up Table.
 

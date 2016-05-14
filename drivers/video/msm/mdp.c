@@ -2,7 +2,7 @@
  *
  * MSM MDP Interface (used by framebuffer core)
  *
- * Copyright (c) 2007-2014, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2007-2014, 2016 The Linux Foundation. All rights reserved.
  * Copyright (C) 2007 Google Incorporated
  *
  * This software is licensed under the terms of the GNU General Public
@@ -1157,7 +1157,7 @@ int mdp_histogram_stop(struct fb_info *info, uint32_t block)
 
 	mgmt->mdp_is_hist_start = FALSE;
 
-	if (!mfd->panel_power_on) {
+	if (mdp_fb_is_power_off(mfd)) {
 		if (mgmt->hist != NULL) {
 			mgmt->hist = NULL;
 			complete(&mgmt->mdp_hist_comp);
@@ -2387,6 +2387,11 @@ static int mdp_off(struct platform_device *pdev)
 	struct msm_fb_data_type *mfd = platform_get_drvdata(pdev);
 
 	pr_debug("%s:+\n", __func__);
+	if (mdp_fb_is_power_on_lp(mfd)) {
+		pr_debug("panel not turned off. keeping overlay on\n");
+		ret = panel_next_low_power_config(pdev, true);
+		return ret;
+	}
 	mdp_histogram_ctrl_all(FALSE);
 	atomic_set(&vsync_cntrl.suspend, 1);
 	atomic_set(&vsync_cntrl.vsync_resume, 0);
@@ -2461,6 +2466,9 @@ static int mdp_on(struct platform_device *pdev)
 
 	if(mfd->index == 0)
 		mdp_iommu_max_map_size = mfd->max_map_size;
+
+	ret = panel_next_low_power_config(pdev, false);
+
 	mdp_pipe_ctrl(MDP_CMD_BLOCK, MDP_BLOCK_POWER_ON, FALSE);
 
 	ret = panel_next_on(pdev);
@@ -3465,7 +3473,7 @@ static int __init mdp_driver_init(void)
 		return ret;
 	}
 
-#if defined(CONFIG_DEBUG_FS)
+#if defined(CONFIG_MDP_DEBUG_FS)
 	mdp_debugfs_init();
 #endif
 

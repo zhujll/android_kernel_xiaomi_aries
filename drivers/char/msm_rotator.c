@@ -29,6 +29,11 @@
 #include <linux/major.h>
 #include <linux/regulator/consumer.h>
 #include <linux/msm_ion.h>
+
+#ifdef CONFIG_FB
+#include <linux/msm_mdp.h>
+#endif
+
 #include <linux/sync.h>
 #include <linux/sw_sync.h>
 

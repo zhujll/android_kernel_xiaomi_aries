@@ -188,7 +188,11 @@ static void mipi_hitachi_lcd_shutdown(void)
 {
 	int ret = 0;
 
-	if(local_mfd && !local_mfd->panel_power_on) {
+	if(local_mfd 
+#ifdef CONFIG_FB_MSM_MDSS
+	 && !local_mfd->panel_power_on
+#endif
+		) {
 		pr_info("%s:panel is already off\n", __func__);
 		return;
 	}
