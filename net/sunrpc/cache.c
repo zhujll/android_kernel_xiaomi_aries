@@ -224,7 +224,7 @@ static inline int cache_is_valid(struct cache_detail *detail, struct cache_head 
 
 static int try_to_negate_entry(struct cache_detail *detail, struct cache_head *h)
 {
-	int rv;
+	int rv = 0;
 
 	write_lock(&detail->hash_lock);
 	rv = cache_is_valid(detail, h);
@@ -256,7 +256,7 @@ static int try_to_negate_entry(struct cache_detail *detail, struct cache_head *h
 int cache_check(struct cache_detail *detail,
 		    struct cache_head *h, struct cache_req *rqstp)
 {
-	int rv;
+	int rv = 0;
 	long refresh_age, age;
 
 	/* First decide return status as best we can */
