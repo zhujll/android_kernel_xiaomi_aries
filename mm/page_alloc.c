@@ -4480,7 +4480,7 @@ void __init set_pageblock_order(void)
  * include/linux/pageblock-flags.h for the values of pageblock_order based on
  * the kernel config
  */
-void __init set_pageblock_order(void)
+void __paginginit set_pageblock_order(void)
 {
 }
 
