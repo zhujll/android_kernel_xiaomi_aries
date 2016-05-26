@@ -385,6 +385,7 @@ static struct gpiomux_setting ext_regulator_config = {
 	.dir = GPIOMUX_OUT_LOW,
 };
 
+#ifdef CONFIG_MSM_UART_HS_USE_HS
 static struct gpiomux_setting gsbi7_func1_cfg = {
 	.func = GPIOMUX_FUNC_1,
 	.drv = GPIOMUX_DRV_8MA,
@@ -397,7 +398,8 @@ static struct gpiomux_setting gsbi7_func2_cfg = {
 	.pull = GPIOMUX_PULL_NONE,
 };
 
-#ifdef CONFIG_MSM_UART_HS_USE_HS
+#else
+
 static struct gpiomux_setting gsbi7_gpio_cfg = {
 	.func = GPIOMUX_FUNC_GPIO,
 	.drv = GPIOMUX_DRV_2MA,
@@ -718,13 +720,21 @@ static struct msm_gpiomux_config apq8064_gsbi_configs[] __initdata = {
 	{
 		.gpio      = 82,	/* GSBI7 UART2 TX */
 		.settings = {
-			[GPIOMUX_SUSPENDED] = &gsbi7_func2_cfg,
+#ifdef  CONFIG_MSM_UART_HS_USE_HS
+			[GPIOMUX_SUSPENDED] = &gsbi7_func2_cfg,  /* GSBI7 UART2 TX */
+#else
+			[GPIOMUX_SUSPENDED] = &gsbi7_gpio_cfg,
+#endif
 		},
 	},
 	{
 		.gpio      = 83,	/* GSBI7 UART2 RX */
 		.settings = {
-			[GPIOMUX_SUSPENDED] = &gsbi7_func1_cfg,
+#ifdef  CONFIG_MSM_UART_HS_USE_HS
+			[GPIOMUX_SUSPENDED] = &gsbi7_func1_cfg,   /* GSBI7 UART2 RX */
+ #else
+			[GPIOMUX_SUSPENDED] = &gsbi7_gpio_cfg,
+#endif
 		},
 	},
 	{
@@ -1285,9 +1295,9 @@ static struct gpiomux_setting hs_uart_sw_suspend_cfg = {
 	.func = GPIOMUX_FUNC_GPIO,
 	.drv = GPIOMUX_DRV_8MA,
 #ifdef CONFIG_MSM_UART_HS_USE_HS
-	.pull = GPIOMUX_PULL_DOWN,
-#else
 	.pull = GPIOMUX_PULL_UP,
+#else
+	.pull = GPIOMUX_PULL_DWON,
 #endif
 };
 
@@ -1368,7 +1378,7 @@ static struct msm_gpiomux_config mitwo_gpio_configs[] __initdata = {
 		.settings = {[GPIOMUX_ACTIVE] = &hdmi_active_1_cfg,			[GPIOMUX_SUSPENDED] = &hdmi_suspend_cfg,},			},
 	{	.gpio = 72,
 		.settings = {[GPIOMUX_ACTIVE] = &hdmi_active_2_cfg,			[GPIOMUX_SUSPENDED] = &hdmi_suspend_cfg,},			},
-#ifdef CONFIG_MSM_UART_HS_USE_HS
+#ifndef CONFIG_MSM_UART_HS_USE_HS
 	{	.gpio = 82,
 		.settings = {								[GPIOMUX_SUSPENDED] = &gsbi7_gpio_cfg,},			},
 	{	.gpio = 83,
