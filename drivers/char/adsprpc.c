@@ -162,8 +162,8 @@ static void free_mem(struct fastrpc_buf *buf)
 {
 	struct fastrpc_apps *me = &gfa;
 
-	if (!IS_ERR_OR_NULL(buf->handle)) {
-		if (!IS_ERR_OR_NULL(buf->virt)) {
+	if (buf->handle) {
+                if (!IS_ERR_OR_NULL(buf->virt)) {
 			ion_unmap_kernel(me->iclient, buf->handle);
 			buf->virt = 0;
 		}
@@ -178,16 +178,19 @@ static int alloc_mem(struct fastrpc_buf *buf)
 	struct sg_table *sg;
 	int err = 0;
 
+	buf->virt = 0;
+	buf->phys = 0;
 	buf->handle = ion_alloc(clnt, buf->size, SZ_4K,
 				ION_HEAP(ION_AUDIO_HEAP_ID), 0);
 	VERIFY(err, 0 == IS_ERR_OR_NULL(buf->handle));
 	if (err)
 		goto bail;
-	buf->virt = ion_map_kernel(clnt, buf->handle);
+        buf->virt = ion_map_kernel(clnt, buf->handle);
 	VERIFY(err, 0 == IS_ERR_OR_NULL(buf->virt));
 	if (err)
 		goto bail;
-	VERIFY(err, 0 != (sg = ion_sg_table(clnt, buf->handle)));
+        sg = ion_sg_table(clnt, buf->handle);
+	VERIFY(err, 0 == IS_ERR_OR_NULL(sg));
 	if (err)
 		goto bail;
 	VERIFY(err, 1 == sg->nents);
