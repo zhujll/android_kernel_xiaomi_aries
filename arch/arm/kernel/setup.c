@@ -56,6 +56,10 @@
 #include <asm/unwind.h>
 #include <asm/memblock.h>
 
+#ifdef CONFIG_KEXEC
+#include <asm/io.h>
+#endif
+
 #if defined(CONFIG_DEPRECATED_PARAM_STRUCT)
 #include "compat.h"
 #endif
@@ -1160,3 +1164,14 @@ const struct seq_operations cpuinfo_op = {
 	.stop	= c_stop,
 	.show	= c_show
 };
+
+#ifdef CONFIG_KEXEC
+static int __init dumphardboot(void) {
+	unsigned long *h = ioremap(KEXEC_HB_PAGE_ADDR, SZ_1M);
+	pr_info("Hardboot: %lx %lx %lx %lx %lx %lx %lx %lx\n",
+		h[0], h[1], h[2], h[3], h[4], h[5], h[6], h[7]);
+	iounmap(h);
+	return 0;
+}
+arch_initcall(dumphardboot);
+#endif
