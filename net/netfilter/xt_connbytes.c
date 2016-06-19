@@ -6,6 +6,9 @@
 #include <linux/bitops.h>
 #include <linux/skbuff.h>
 #include <linux/math64.h>
+
+#include <asm/atomic.h>
+
 #include <linux/netfilter/x_tables.h>
 #include <linux/netfilter/xt_connbytes.h>
 #include <net/netfilter/nf_conntrack.h>
@@ -26,7 +29,7 @@ connbytes_mt(const struct sk_buff *skb, struct xt_action_param *par)
 	u_int64_t what = 0;	/* initialize to make gcc happy */
 	u_int64_t bytes = 0;
 	u_int64_t pkts = 0;
-	const struct nf_conn_counter *counters;
+	struct nf_conn_counter *counters;
 
 	ct = nf_ct_get(skb, &ctinfo);
 	if (!ct)
