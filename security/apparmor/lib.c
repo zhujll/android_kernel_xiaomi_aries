@@ -169,12 +169,12 @@ static void do_vfree(struct work_struct *work)
 }
 
 /**
- * kvfree - free an allocation do by kvmalloc
+ * __kvfree - free an allocation do by kvmalloc
  * @buffer: buffer to free (MAYBE_NULL)
  *
  * Free a buffer allocated by kvmalloc
  */
-void kvfree(void *buffer)
+void __kvfree(void *buffer)
 {
 	if (is_vmalloc_addr(buffer)) {
 		/* Data is no longer valid so just use the allocated space
