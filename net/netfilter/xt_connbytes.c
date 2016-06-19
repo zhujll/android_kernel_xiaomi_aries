@@ -6,6 +6,9 @@
 #include <linux/bitops.h>
 #include <linux/skbuff.h>
 #include <linux/math64.h>
+
+#include <asm/atomic.h>
+
 #include <linux/netfilter/x_tables.h>
 #include <linux/netfilter/xt_connbytes.h>
 #include <net/netfilter/nf_conntrack.h>
