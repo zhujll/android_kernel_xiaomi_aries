@@ -30,4 +30,12 @@ config XIAOMI_EARJACK_UART
 	help
 	  Enable Earjack UART debugger. This disables headphone support
 
+config XIAOMI_KEXEC_HARDBOOT_SYSNODE
+	bool "kexec hardboot sys node"
+	default n
+	depends on KEXEC
+	depends on KEXEC_HARDBOOT
+	help
+	  Interface to Show kexec hardboot address
+
 endmenu

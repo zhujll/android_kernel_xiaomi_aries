@@ -700,6 +700,8 @@ CONFIG_CMDLINE=""
 CONFIG_KEXEC=y
 CONFIG_KEXEC_HARDBOOT=y
 CONFIG_ATAGS_PROC=y
+# create /sys/devices/platform/kexec/kexec_state for check hardboot state
+CONFIG_XIAOMI_KEXEC_HARDBOOT_SYSNODE=y
 # CONFIG_CRASH_DUMP is not set
 # CONFIG_AUTO_ZRELADDR is not set
 
