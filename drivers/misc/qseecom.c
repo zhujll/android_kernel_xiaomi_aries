@@ -2378,6 +2378,7 @@ static int qseecom_open(struct inode *inode, struct file *file)
 	file->private_data = data;
 	data->abort = 0;
 	data->type = QSEECOM_GENERIC;
+	data->service = false;
 	data->released = false;
 	memset((void *)data->client.app_name, 0, MAX_APP_NAME_SIZE);
 	init_waitqueue_head(&data->abort_wq);
