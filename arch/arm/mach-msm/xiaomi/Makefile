@@ -4,5 +4,6 @@ subdir-ccflags-$(CONFIG_ARCH_MSM) += -Iarch/arm/mach-msm
 
 obj-$(CONFIG_PM8921_BMS_XIAOMI) += bms-batterydata-sony.o bms-batterydata-samsung.o bms-batterydata-lg.o bms-batterydata-lg-3000.o bms-batterydata-sony-3000.o bms-batterydata-samsung-3000.o bms-batterydata-samsung-2000.o bms-batterydata-lg-2000.o
 obj-$(CONFIG_MACH_XIAOMI) += devices_xiaomi.o
+obj-$(CONFIG_XIAOMI_KEXEC_HARDBOOT_SYSNODE) += xiaomi_kexec_hardboot_sys_node.o
 
 CFLAGS_devices_xiaomi.o += -Idrivers/staging/android
