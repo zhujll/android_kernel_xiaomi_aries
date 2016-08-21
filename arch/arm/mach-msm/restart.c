@@ -332,8 +332,16 @@ late_initcall(msm_pmic_restart_init);
 #ifdef CONFIG_KEXEC_HARDBOOT
 static void msm_kexec_hardboot_hook(void)
 {
+#ifdef CONFIG_MSM_DLOAD_MODE
+	/* Do not enter download mode on reboot. */
+	set_dload_mode(0);
+#endif
 	// Set PMIC to restart-on-poweroff
 	pm8xxx_reset_pwr_off(1);
+
+	/* Reboot with the recovery kernel since the boot kernel decompressor may
+	 * not support the hardboot jump. */
+	__raw_writel(0x77665502, restart_reason);
 }
 #endif
 
