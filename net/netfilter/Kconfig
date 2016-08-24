@@ -1004,7 +1004,7 @@ config NETFILTER_XT_MATCH_PKTTYPE
 
 config NETFILTER_XT_MATCH_QTAGUID
 	bool '"quota, tag, owner" match and stats support'
-        depends on NETFILTER_XT_MATCH_SOCKET
+    depends on NETFILTER_XT_MATCH_SOCKET
 	depends on NETFILTER_XT_MATCH_OWNER=n
 	help
 	  This option replaces the `owner' match. In addition to matching
@@ -1100,7 +1100,7 @@ config NETFILTER_XT_MATCH_SCTP
 	  <file:Documentation/kbuild/modules.txt>.  If unsure, say `N'.
 
 config NETFILTER_XT_MATCH_SOCKET
-	tristate '"socket" match support (EXPERIMENTAL)'
+	bool '"socket" match support (EXPERIMENTAL)'
 	depends on EXPERIMENTAL
 	depends on NETFILTER_TPROXY
 	depends on NETFILTER_XTABLES
@@ -1114,7 +1114,6 @@ config NETFILTER_XT_MATCH_SOCKET
 	  It can be used in combination with the MARK target and policy
 	  routing to implement full featured non-locally bound sockets.
 
-	  To compile it as a module, choose M here.  If unsure, say N.
 
 config NETFILTER_XT_MATCH_STATE
 	tristate '"state" match support'

@@ -274,7 +274,9 @@
 #include <net/tcp.h>
 #include <net/xfrm.h>
 #include <net/ip.h>
+#if defined(CONFIG_IPV6) || defined(CONFIG_IPV6_MODULE)
 #include <net/ip6_route.h>
+#endif
 #include <net/ipv6.h>
 #include <net/transp_v6.h>
 #include <net/netdma.h>
@@ -3472,3 +3474,5 @@ restart:
 
 	return 0;
 }
+
+EXPORT_SYMBOL(tcp_nuke_addr);
