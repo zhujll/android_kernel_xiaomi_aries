@@ -4763,7 +4763,7 @@ static struct addrconf_sysctl_table
 			.data           = &ipv6_devconf.force_tllao,
 			.maxlen         = sizeof(int),
 			.mode           = 0644,
-			.proc_handler   = proc_dointvec
+			.proc_handler   = proc_dointvec,
 		},
 		{
 			.procname	= "accept_ra_prefix_route",
@@ -4772,6 +4772,7 @@ static struct addrconf_sysctl_table
 			.mode		= 0644,
 			.proc_handler	= proc_dointvec,
 		},
+		{
 			.procname       = "use_oif_addrs_only",
 			.data           = &ipv6_devconf.use_oif_addrs_only,
 			.maxlen         = sizeof(int),

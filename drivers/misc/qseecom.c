@@ -226,6 +226,7 @@ struct qseecom_dev_handle {
 		struct qseecom_client_handle client;
 		struct qseecom_listener_handle listener;
 	};
+	bool service;
 	bool released;
 	int               abort;
 	wait_queue_head_t abort_wq;
