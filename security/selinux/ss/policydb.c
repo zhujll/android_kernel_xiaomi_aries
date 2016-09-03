@@ -1389,6 +1389,7 @@ static int class_read(struct policydb *p, struct hashtab *h, void *fp)
 		rc = next_entry(buf, fp, sizeof(u32) * 1);
 		if (rc)
 			goto bad;
+
 		cladatum->default_type = le32_to_cpu(buf[0]);
 	}
 

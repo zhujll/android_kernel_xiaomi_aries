@@ -308,6 +308,7 @@ armpmu_add(struct perf_event *event, int flags)
 			pr_err("Event: %llx failed constraint check.\n",
 					event->attr.config);
 			event->state = PERF_EVENT_STATE_OFF;
+			err = -EPERM;
 			goto out;
 		}
 
@@ -413,6 +414,12 @@ armpmu_release_hardware(struct arm_pmu *armpmu)
 	int i, irq, irqs;
 	struct platform_device *pmu_device = armpmu->plat_device;
 
+	/*
+	 * If a cpu comes online during this function, do not enable its irq.
+	 * If a cpu goes offline, it should disable its irq.
+	 */
+	armpmu->pmu_state = ARM_PMU_STATE_GOING_DOWN;
+
 	irqs = min(pmu_device->num_resources, num_possible_cpus());
 
 	for (i = 0; i < irqs; ++i) {
@@ -421,6 +428,8 @@ armpmu_release_hardware(struct arm_pmu *armpmu)
 		irq = platform_get_irq(pmu_device, i);
 		armpmu->free_pmu_irq(irq);
 	}
+
+	armpmu->pmu_state = ARM_PMU_STATE_OFF;
 
 	release_pmu(armpmu->type);
 }
@@ -493,6 +502,7 @@ armpmu_reserve_hardware(struct arm_pmu *armpmu)
 
 		cpumask_set_cpu(i, &armpmu->active_irqs);
 	}
+	armpmu->pmu_state = ARM_PMU_STATE_RUNNING;
 
 	return 0;
 }
@@ -810,6 +820,8 @@ static int __cpuinit pmu_cpu_notify(struct notifier_block *b,
 					unsigned long action, void *hcpu)
 {
 	int irq;
+#if 0
+<<<<<<< HEAD
 	struct pmu *pmu;
 	int cpu = (int)hcpu;
 
@@ -840,12 +852,29 @@ static int __cpuinit pmu_cpu_notify(struct notifier_block *b,
 			 */
 			if (cpu_pmu &&
 				cpu_pmu->plat_device->dev.platform_data) {
-				irq = platform_get_irq(cpu_pmu->plat_device, 0);
-				smp_call_function_single((int)hcpu,
-						disable_irq_callback, &irq, 1);
-			}
-			return NOTIFY_DONE;
+=======
+#endif
+	unsigned long masked_action = action & ~CPU_TASKS_FROZEN;
+	int ret = NOTIFY_DONE;
 
+	if ((masked_action != CPU_DOWN_PREPARE) && (masked_action != CPU_STARTING)) {
+		return NOTIFY_DONE;
+	}
+	if (masked_action == CPU_STARTING) {
+		ret = NOTIFY_OK;
+	}
+	switch (masked_action) {
+	case CPU_DOWN_PREPARE:
+		if (cpu_pmu->pmu_state != ARM_PMU_STATE_OFF) {
+			/* Disarm the PMU IRQ before disappearing. */
+			if (cpu_pmu->plat_device) {
+				irq = platform_get_irq(cpu_pmu->plat_device, 0);
+				smp_call_function_single((int)hcpu, disable_irq_callback, &irq, 1);
+			}
+		}
+		break;
+#if 0
+<<<<<<< HEAD
 		case CPU_STARTING:
 			/*
 			 * If this is on a multicore CPU, we need
@@ -862,16 +891,23 @@ static int __cpuinit pmu_cpu_notify(struct notifier_block *b,
 				pmu = &cpu_pmu->pmu;
 				pmu->pmu_enable(pmu);
 				return NOTIFY_OK;
-			}
-		default:
-			return NOTIFY_DONE;
+=======
+#endif
+	case CPU_STARTING:
+		/* Reset PMU to clear counters for ftrace buffer. */
+		if (cpu_pmu->reset) {
+			cpu_pmu->reset(NULL);
 		}
+		if (cpu_pmu->pmu_state == ARM_PMU_STATE_RUNNING) {
+			/* Arm the PMU IRQ before appearing. */
+			if (cpu_pmu->plat_device) {
+				irq = platform_get_irq(cpu_pmu->plat_device, 0);
+				enable_irq_callback(&irq);
+			}
+		}
+		break;
 	}
-
-	if ((action & ~CPU_TASKS_FROZEN) != CPU_STARTING)
-		return NOTIFY_DONE;
-
-	return NOTIFY_OK;
+	return ret;
 }
 
 static struct notifier_block __cpuinitdata pmu_cpu_notifier = {

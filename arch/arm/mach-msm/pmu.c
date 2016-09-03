@@ -10,6 +10,7 @@
  * GNU General Public License for more details.
  */
 
+#include <linux/irq.h>
 #include <linux/platform_device.h>
 #include <linux/irq.h>
 #include <asm/pmu.h>
@@ -18,7 +19,7 @@
 
 #if defined(CONFIG_ARCH_MSM_KRAITMP) || defined(CONFIG_ARCH_MSM_SCORPIONMP)
 static DEFINE_PER_CPU(u32, pmu_irq_cookie);
-
+#if 0
 static __ref int armpmu_cpu_up(int cpu)
 {
 	int ret = 0;
@@ -31,7 +32,7 @@ static __ref int armpmu_cpu_up(int cpu)
 	}
 	return ret;
 }
-
+#endif
 static int
 multicore_request_irq(int irq, irq_handler_t *handle_irq)
 {
@@ -57,12 +58,10 @@ multicore_free_irq(int irq)
 	int cpu;
 	struct irq_desc *desc = irq_to_desc(irq);
 
-	if (irq >= 0) {
-		for_each_cpu(cpu, desc->percpu_enabled) {
-			if (!armpmu_cpu_up(cpu))
-				smp_call_function_single(cpu,
+	if ((irq >= 0) && desc) {
+		for_each_cpu(cpu, desc->percpu_enabled)
+			smp_call_function_single(cpu,
 					disable_irq_callback, &irq, 1);
-		}
 		free_percpu_irq(irq, &pmu_irq_cookie);
 	}
 }
